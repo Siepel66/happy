@@ -21,7 +21,12 @@ int main(int argc, char **argv) {
   	mySwitch.on(&mySwitch);
 
   	if ( start_rest_server( 8888 ) == REST_SERVER_OK ) {
+
+        add_rest_server_handler( "/flierp" );
+		add_rest_server_handler( "/TWEE" );
+
         (void) getc (stdin);
+        remove_rest_server_handlers();
         stop_rest_server();		
   	}
 
