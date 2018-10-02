@@ -10,7 +10,7 @@
 
 typedef struct __REST_HANDLER {
   char *tag;
-  //REST_HANDLER_FN *fn;
+  REST_HANDLER_FN handler_fn;
   struct __REST_HANDLER *next;
 } REST_HANDLER;
 
@@ -20,11 +20,12 @@ static REST_HANDLER *handlers = NULL;
 
 static int rest_parse( const char *url ) {
   REST_HANDLER *h = handlers;
-  while (( h != NULL ) && ( strncmp( h->tag, url, strlen( h->tag ) ) != 0 )) { 
+  while (( h != NULL ) && ( strncmp( h->tag, url, strlen( h->tag ) ) != 0 )) {
      h = h->next;
   }
   if ( h != NULL ) {
     printf("Detected: %s\n", h->tag);
+    if (h->handler_fn != NULL) h->handler_fn(url +  strlen( h->tag) );
     return 0;
   } else {
     return 1;
@@ -70,7 +71,7 @@ static int rest_handler(void * cls,
   return ret;
 }
 
-REST_SERVER_RESULT add_rest_server_handler( const char *tag ) {
+REST_SERVER_RESULT add_rest_server_handler( const char *tag, REST_HANDLER_FN handler_fn ) {
   REST_SERVER_RESULT result = REST_SERVER_ERROR;
   REST_HANDLER *handler = malloc(sizeof( REST_HANDLER ));
 
@@ -81,6 +82,7 @@ REST_SERVER_RESULT add_rest_server_handler( const char *tag ) {
     if ( handler->tag != NULL ) {
       strcpy( handler->tag, tag );
       strcat( handler->tag, "/");
+      handler->handler_fn = handler_fn;
       handler->next = handlers;
       handlers = handler;
       printf("Handlers = %p\n", handlers);
@@ -108,7 +110,7 @@ REST_SERVER_RESULT remove_rest_server_handlers( void ) {
 REST_SERVER_RESULT start_rest_server(unsigned short port) {
   REST_SERVER_RESULT result = REST_SERVER_ERROR;
   if ( rest_server_daemon == NULL ) {
-    rest_server_daemon =  MHD_start_daemon( 
+    rest_server_daemon =  MHD_start_daemon(
         MHD_USE_THREAD_PER_CONNECTION,
         port,
         NULL,
