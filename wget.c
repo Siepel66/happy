@@ -12,7 +12,9 @@
 #include "wget.h"
 
 //#define DEBUG(a) printf a
-#define DEBUG(a) 
+#define DEBUG(a)
+
+#define OK_HEADER "HTTP/1.1 200 OK"
 
 
 
@@ -24,9 +26,10 @@ WGET_RESULT wget(char *servername, unsigned short port, char *request, int respo
   struct sockaddr_in serveraddr;
   char *req = NULL;
   WGET_RESULT result = WGET_ERROR;
+  int bytes_read = 0;
 
   static const char pcRequest[]="Get %s HTTP/1.1\r\n Host: %s\r\n \r\n \r\n";
-  
+
   if (tcpSocket >= 0) {
      server = gethostbyname(servername);
      if (server != NULL) {
@@ -48,13 +51,17 @@ WGET_RESULT wget(char *servername, unsigned short port, char *request, int respo
                 DEBUG(("wget Request: \n%s", req));
                 if (send(tcpSocket, req, strlen(req), 0) >= 0) {
                     if (responseLen > 0) {
-                        bzero(response, responseLen);
-                        recv(tcpSocket, response, responseLen - 1, 0);
-                        DEBUG(("wget Response: \n%s", response));
-                        result = WGET_OK;
+                      bzero(response, responseLen);
+                      responseLen--;
+                      do {
+                         bytes_read = recv(tcpSocket, response + bytes_read, responseLen - bytes_read, 0);
+                      } while (( bytes_read > 0 ) && ( bytes_read < responseLen ));
+
+                      DEBUG(("wget Response: \n%s", response));
+                      if (strncmp(OK_HEADER, response, sizeof(OK_HEADER) - 1 ) == 0) result = WGET_OK;
                     } else {
                       result = WGET_OK;
-                    } 
+                    }
 
                     close(tcpSocket);
                 }
@@ -63,5 +70,5 @@ WGET_RESULT wget(char *servername, unsigned short port, char *request, int respo
         }
       }
     }
-    return result;    
+    return result;
 }
