@@ -1,4 +1,4 @@
-MODULES=wget.o wget_switch.o rest_server.o
+MODULES=wget.o wget_switch.o rest_server.o switch.o
 LIBS=-l microhttpd
 
 .c.o:

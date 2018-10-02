@@ -9,48 +9,8 @@
 #include "wget_switch.h"
 #include "rest_server.h"
 
+#include "switch.h"
 
-typedef enum __SWITCH_RESULT {
-    SWITCH_RESULT_OK = 0,
-    SWITCH_RESULT_ERROR
-} SWITCH_RESULT;
-
-typedef enum __SWITCH_TYPE {
-	SWITCH_TYPE_WGET = 0
-} SWITCH_TYPE;
-
-typedef struct __SWITCHES {
-	const char *name;
-	int id;
-	SWITCH_TYPE type;
-	void *mySwitch;
-	struct __SWITCHES *next;
-} SWITCHES;
-
-SWITCHES *switches = NULL;
-
-SWITCHES *switch_getByID(int id) {
-	SWITCHES *mySwitch = switches;
-	while ((mySwitch != NULL) && (mySwitch->id != id)) mySwitch = mySwitch->next;
-	return mySwitch;
-}
-
-SWITCH_RESULT switch_addNew(const char *name, int id, SWITCH_TYPE type, void *mySwitch) {
-	SWITCH_RESULT result = SWITCH_RESULT_ERROR;
-  SWITCHES *newSwitch = calloc(1, sizeof(SWITCHES));
-
-  if (newSwitch != NULL) {
-		newSwitch->name = name;
-		newSwitch->id = id;
-	  newSwitch->type = type;
-		newSwitch->mySwitch = mySwitch;
-		newSwitch->next = switches;
-		switches = newSwitch;
-		result = SWITCH_RESULT_OK;
-	}
-
-	return result;
-}
 
 char *getItem(const char *items, char **next) {
 	char *p = strchr(items, '/');
