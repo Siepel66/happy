@@ -1,4 +1,4 @@
-var myLog = require('./mylog.js');
+var myLog = require('../support/mylog.js');
 
 class Switch {
   constructor(name, state) {
