@@ -5,11 +5,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include "happy.h"
+#include "switch.h"
+
 
 #include "wget_switch.h"
 #include "rest_server.h"
 
-#include "switch.h"
 
 
 char *getItem(const char *items, char **next) {
@@ -30,7 +32,7 @@ char *getItem(const char *items, char **next) {
 }
 
 
-REST_SERVER_RESULT *flierp_handler(char *params) {
+HAPPY_RESULT *flierp_handler(char *params) {
   char *id = params;
 	char *command = NULL;
 	SWITCHES *mySwitch;
@@ -75,7 +77,7 @@ int main(int argc, char **argv) {
   //usleep(1000000);
   //mySwitch.on(&mySwitch);
 
-  	if ( start_rest_server( 8888 ) == REST_SERVER_OK ) {
+  	if ( start_rest_server( 8888 ) == HAPPY_RESULT_OK ) {
 
         add_rest_server_handler( "/flierp", (REST_HANDLER_FN) flierp_handler);
 		    add_rest_server_handler( "/TWEE", NULL );

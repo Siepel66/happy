@@ -9,23 +9,19 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
+#include "happy.h"
 #include "wget.h"
-
-//#define DEBUG(a) printf a
-#define DEBUG(a)
 
 #define OK_HEADER "HTTP/1.1 200 OK"
 
-
-
-WGET_RESULT wget(char *servername, unsigned short port, char *request, int responseLen, char *response) {
+HAPPY_RESULT wget(char *servername, unsigned short port, char *request, int responseLen, char *response) {
 
   int tcpSocket = socket(AF_INET, SOCK_STREAM, 0);
   struct hostent *server;
   unsigned int j = 0;
   struct sockaddr_in serveraddr;
   char *req = NULL;
-  WGET_RESULT result = WGET_ERROR;
+  HAPPY_RESULT result = HAPPY_RESULT_ERROR;
   int bytes_read = 0;
 
   static const char pcRequest[]="Get %s HTTP/1.1\r\n Host: %s\r\n \r\n \r\n";
@@ -58,9 +54,9 @@ WGET_RESULT wget(char *servername, unsigned short port, char *request, int respo
                       } while (( bytes_read > 0 ) && ( bytes_read < responseLen ));
 
                       DEBUG(("wget Response: \n%s", response));
-                      if (strncmp(OK_HEADER, response, sizeof(OK_HEADER) - 1 ) == 0) result = WGET_OK;
+                      if (strncmp(OK_HEADER, response, sizeof(OK_HEADER) - 1 ) == 0) result = HAPPY_RESULT_OK;
                     } else {
-                      result = WGET_OK;
+                      result = HAPPY_RESULT_OK;
                     }
 
                     close(tcpSocket);

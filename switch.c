@@ -1,5 +1,6 @@
 
 #include <malloc.h>
+#include "happy.h"
 #include "switch.h"
 
 static SWITCHES *switches = NULL;
@@ -10,8 +11,8 @@ SWITCHES *switch_getByID(int id) {
 	return mySwitch;
 }
 
-SWITCH_RESULT switch_addNew(const char *name, int id, SWITCH_TYPE type, void *mySwitch) {
-	SWITCH_RESULT result = SWITCH_RESULT_ERROR;
+HAPPY_RESULT switch_addNew(const char *name, int id, SWITCH_TYPE type, void *mySwitch) {
+	HAPPY_RESULT result = HAPPY_RESULT_ERROR;
   SWITCHES *newSwitch = calloc(1, sizeof(SWITCHES));
 
   if (newSwitch != NULL) {
@@ -21,8 +22,14 @@ SWITCH_RESULT switch_addNew(const char *name, int id, SWITCH_TYPE type, void *my
 		newSwitch->mySwitch = mySwitch;
 		newSwitch->next = switches;
 		switches = newSwitch;
-		result = SWITCH_RESULT_OK;
+		result = HAPPY_RESULT_OK;
 	}
 
 	return result;
+}
+
+HAPPY_RESULT switch_setState(void *self, SWITCH_STATE newState) {
+  SWITCHES *thisSwitch = (SWITCHES *) self;
+
+  return thisSwitch->mySwitch->on(self);
 }

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
+#include "happy.h"
 #include "rest_server.h"
 
 typedef struct __REST_HANDLER {
@@ -71,8 +72,8 @@ static int rest_handler(void * cls,
   return ret;
 }
 
-REST_SERVER_RESULT add_rest_server_handler( const char *tag, REST_HANDLER_FN handler_fn ) {
-  REST_SERVER_RESULT result = REST_SERVER_ERROR;
+HAPPY_RESULT add_rest_server_handler( const char *tag, REST_HANDLER_FN handler_fn ) {
+  HAPPY_RESULT result = HAPPY_RESULT_ERROR;
   REST_HANDLER *handler = malloc(sizeof( REST_HANDLER ));
 
   if ( handler != NULL ) {
@@ -86,7 +87,7 @@ REST_SERVER_RESULT add_rest_server_handler( const char *tag, REST_HANDLER_FN han
       handler->next = handlers;
       handlers = handler;
       printf("Handlers = %p\n", handlers);
-      result = REST_SERVER_OK;
+      result = HAPPY_RESULT_OK;
     } else {
       free( handler );
     }
@@ -96,7 +97,7 @@ REST_SERVER_RESULT add_rest_server_handler( const char *tag, REST_HANDLER_FN han
 }
 
 
-REST_SERVER_RESULT remove_rest_server_handlers( void ) {
+HAPPY_RESULT remove_rest_server_handlers( void ) {
   REST_HANDLER *handler = handlers;
   while ( handler != NULL ) {
     handlers = handlers->next;
@@ -104,11 +105,11 @@ REST_SERVER_RESULT remove_rest_server_handlers( void ) {
     free( handler );
     handler = handlers;
   }
-  return REST_SERVER_OK;
+  return HAPPY_RESULT_OK;
 }
 
-REST_SERVER_RESULT start_rest_server(unsigned short port) {
-  REST_SERVER_RESULT result = REST_SERVER_ERROR;
+HAPPY_RESULT start_rest_server(unsigned short port) {
+  HAPPY_RESULT result = HAPPY_RESULT_ERROR;
   if ( rest_server_daemon == NULL ) {
     rest_server_daemon =  MHD_start_daemon(
         MHD_USE_THREAD_PER_CONNECTION,
@@ -118,17 +119,17 @@ REST_SERVER_RESULT start_rest_server(unsigned short port) {
         &rest_handler,
         NULL,
         MHD_OPTION_END);
-    if ( rest_server_daemon != NULL ) result = REST_SERVER_OK;
+    if ( rest_server_daemon != NULL ) result = HAPPY_RESULT_OK;
   }
   return result;
 }
 
-REST_SERVER_RESULT stop_rest_server( void ) {
-  REST_SERVER_RESULT result = REST_SERVER_ERROR;
+HAPPY_RESULT stop_rest_server( void ) {
+  HAPPY_RESULT result = HAPPY_RESULT_ERROR;
   if ( rest_server_daemon != NULL ) {
     MHD_stop_daemon( rest_server_daemon );
     rest_server_daemon = NULL;
-    result = REST_SERVER_OK;
+    result = HAPPY_RESULT_OK;
   }
   return result;
 }
